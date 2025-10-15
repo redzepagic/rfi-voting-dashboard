@@ -1,0 +1,329 @@
+Napravi frontend prototip Revizijske Aplikacije za praćenje izbornog procesa optimizovan za desktop i tablet na bosanskom jeziku.
+
+## Tehnički zahtjevi:
+- React sa Vite
+- shadcn/ui komponente sa narandžastom temom (#FF6B35)
+- Tailwind CSS
+- Recharts ili Chart.js za grafike
+- React-leaflet za mapu BiH
+- Mock data za simulaciju
+- Lucide-react ikone
+
+## UI/UX Dizajn:
+
+### Header:
+- Logo CIK BiH (lijevo)
+- Naslov: "Centralna izborna komisija BiH - Revizijski Portal"
+- Korisnik info (desno): "Revizor: [Ime]" sa Avatar
+- Dugme za logout
+- Narandžasta pozadina (#FF6B35)
+
+### Glavni Dashboard - Grid Layout (2x2 + bottom):
+┌─────────────────────────────┬─────────────────────────────┐
+│   PREGLED PO ENTITETIMA     │    STATISTIKE VALIDNOSTI    │
+│   [Interaktivna mapa BiH]   │    [Pie chart validnih]     │
+│   FBiH: 2,847 mjesta       │    Validni: 95.3%          │
+│   RS: 2,103 mjesta         │    Nevažeći: 3.2%          │
+│   BD: 650 mjesta           │    Sporni: 1.5%            │
+└─────────────────────────────┴─────────────────────────────┘
+┌─────────────────────────────┬─────────────────────────────┐
+│   AUTENTIFIKACIJE (LIVE)    │    ANOMALIJE I UPOZORENJA   │
+│   [Real-time brojač]        │    [Lista sa alertima]      │
+│   Uspješne: 458,392         │    ⚠️ GM-1234: Visoka stopa│
+│   Neuspješne: 1,247        │    🔴 GM-5678: Prekid veze  │
+│   Blokirane: 89            │    ⚠️ GM-9012: Sumnjivi uzorak│
+└─────────────────────────────┴─────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│              DETALJAN PREGLED PO GLASAČKOM MJESTU        │
+│   [Tabela sa search, filter i sort opcijama]            │
+└──────────────────────────────────────────────────────────┘
+
+### Bočni meni (Sidebar):
+📊 Dashboard (trenutna stranica)
+📍 Glasačka mjesta
+
+Pregled po opštinama
+Mapa lokacija
+Status uživo
+📈 Izvještaji
+Satni izvještaji
+Anomalije
+Validacija glasova
+👥 Autentifikacije
+Log pristupa
+Blokirani pokušaji
+Statistike po vremenu
+📁 Audit Log
+Sve aktivnosti
+Izmjene podataka
+Sistemski eventi
+⚙️ Postavke
+
+
+### Mock Data struktura:
+```javascript
+const mockGlasackaMjesta = [
+  {
+    id: "GM-0001",
+    naziv: "OŠ Safvet-beg Bašagić",
+    opstina: "Centar",
+    entitet: "FBiH",
+    grad: "Sarajevo",
+    koordinate: [43.8563, 18.4131],
+    status: "aktivno",
+    brojBiraca: 1250,
+    glasalo: 847,
+    izlaznost: 67.76,
+    validnihGlasova: 823,
+    nevazeciGlasova: 18,
+    spornihGlasova: 6,
+    autentifikacije: {
+      uspjesne: 847,
+      neuspjesne: 23,
+      blokirane: 2,
+      prosjecnoVrijeme: "45s"
+    },
+    anomalije: [],
+    zadnjeAzuriranje: "2024-10-14 15:32:00"
+  },
+  {
+    id: "GM-0002", 
+    naziv: "Gimnazija Mostar",
+    opstina: "Stari Grad",
+    entitet: "FBiH",
+    grad: "Mostar",
+    koordinate: [43.3438, 17.8078],
+    status: "aktivno",
+    brojBiraca: 980,
+    glasalo: 712,
+    izlaznost: 72.65,
+    validnihGlasova: 698,
+    nevazeciGlasova: 12,
+    spornihGlasova: 2,
+    autentifikacije: {
+      uspjesne: 712,
+      neuspjesne: 45,
+      blokirane: 5,
+      prosjecnoVrijeme: "38s"
+    },
+    anomalije: [
+      {
+        tip: "upozorenje",
+        opis: "Visoka stopa neuspješnih autentifikacija",
+        vrijeme: "14:20"
+      }
+    ],
+    zadnjeAzuriranje: "2024-10-14 15:33:00"
+  }
+  // Dodaj još 20-30 test lokacija
+];
+
+const mockAnomalije = [
+  {
+    id: 1,
+    glasackoMjesto: "GM-1234",
+    tip: "kritično",
+    opis: "Prekid internetske veze duži od 10 minuta",
+    vrijeme: "14:45",
+    status: "aktivno"
+  },
+  {
+    id: 2,
+    glasackoMjesto: "GM-5678", 
+    tip: "upozorenje",
+    opis: "Neobično visoka stopa nevažećih listića (>10%)",
+    vrijeme: "13:20",
+    status: "riješeno"
+  }
+];
+Glavne funkcionalnosti:
+1. Interaktivna mapa BiH:
+
+Prikaz svih 5600 glasačkih mjesta kao tačke
+Boje tačaka prema statusu:
+
+Zelena: Normalno funkcionisanje
+Žuta: Upozorenja
+Crvena: Kritični problemi
+Siva: Neaktivno
+
+
+Hover: Mini info karticu
+Click: Otvara detaljan pregled
+
+2. Tabela glasačkih mjesta:
+Kolone:
+
+ID glasačkog mjesta
+Naziv i lokacija
+Izlaznost (% sa progress bar)
+Validni/Nevažeći/Sporni glasovi
+Autentifikacije (uspješne/neuspješne)
+Anomalije (badge sa brojem)
+Status (badge)
+Akcije (Detalji, Izvještaj, Audit log)
+
+Filteri:
+
+Po entitetu (FBiH, RS, BD)
+Po opštini
+Po statusu
+Po anomalijama
+Vremenski period
+
+3. Detaljan pregled glasačkog mjesta (Modal/Nova stranica):
+Tabovi:
+
+Opšte informacije
+
+Osnovni podaci o lokaciji
+Kontakt informacije
+Članovi biračkog odbora
+
+
+Statistike glasanja
+
+Graf izlaznosti po satima
+Distribucija glasova
+Poređenje sa prethodnim izborima
+
+
+Autentifikacije
+
+Timeline uspješnih/neuspješnih pokušaja
+Prosječno vrijeme autentifikacije
+Lista blokiranih pokušaja sa razlogom
+
+
+Validacija glasova
+
+Detaljan breakdown validnih/nevažećih
+Razlozi nevažećih listića
+Sporni glasovi sa opisom
+
+
+Audit Log
+
+Sve aktivnosti na ovom mjestu
+Ko je radio izmjene i kada
+Sistemski eventi
+
+
+
+4. Real-time ažuriranja:
+
+Simulirati WebSocket konekciju
+Ažurirati brojače svakih 5 sekundi
+Toast notifikacije za nove anomalije
+Zvučni alert za kritične probleme
+
+5. Izvještaji (generisanje):
+Tipovi izvještaja:
+
+Satni izvještaj aktivnosti
+Izvještaj anomalija
+Izvještaj po glasačkom mjestu
+Sumarni izvještaj
+
+Format:
+
+Preview u browseru
+Download kao PDF
+Export kao Excel/CSV
+
+shadcn/ui komponente:
+
+Tabs za različite sekcije
+DataTable sa sortiranjem i filterima
+Sheet za bočni meni
+Dialog za detaljne preglede
+Badge za statuse
+Alert za upozorenja
+Progress za izlaznost
+Select za filtere
+DatePicker za vremenski period
+Skeleton za loading stanja
+Toast za notifikacije
+Separator za vizuelno razdvajanje
+
+Tema i boje:
+cssprimary: #FF6B35 (narandžasta)
+secondary: #FFA500 (svjetlija narandžasta)
+success: #10B981
+warning: #F59E0B  
+danger: #EF4444
+info: #3B82F6
+background: #F9FAFB
+foreground: #111827
+Dodatne stranice:
+Stranica: Glasačka mjesta
+
+Grid view sa karticama
+Filtriranje po regionima
+Search funkcionalnost
+Sortiranje po različitim kriterijima
+
+Stranica: Audit Log
+
+Kompletan log svih aktivnosti
+Filteri: datum, tip aktivnosti, korisnik
+Export mogućnosti
+
+Stranica: Anomalije
+
+Dashboard samo za anomalije
+Kategorizacija po tipu i ozbiljnosti
+Akcije za rješavanje
+
+Simulacija real-time podataka:
+javascript// Funkcija za random ažuriranje podataka
+const updateRandomData = () => {
+  // Povećaj broj glasača
+  // Dodaj novu anomaliju
+  // Ažuriraj status nekog mjesta
+  // Simuliraj novu autentifikaciju
+};
+
+// Pokreni svakih 3-5 sekundi
+setInterval(updateRandomData, Math.random() * 2000 + 3000);
+Responsive dizajn:
+
+Desktop: Puni layout sa svim panelima
+Tablet: Collapsible sidebar, 2 kolone
+Mobile: Stack layout, hamburger meni
+
+Tekstovi na bosanskom:
+Navigacija:
+
+"Kontrolna tabla"
+"Glasačka mjesta"
+"Izvještaji"
+"Autentifikacije"
+"Revizijski zapisnik"
+"Postavke"
+
+Statusi:
+
+"Aktivno"
+"Neaktivno"
+"Upozorenje"
+"Kritično"
+
+Akcije:
+
+"Filtriraj"
+"Pretraži"
+"Izvezi"
+"Generiši izvještaj"
+"Prikaži detalje"
+
+Poruke:
+
+"Nema novih anomalija"
+"Sistem funkcioniše normalno"
+"Potrebna pažnja"
+"Kritično stanje - hitna intervencija"
+
+Napravi profesionalnu revizorsku aplikaciju sa svim navedenim funkcionalnostima, modernim UI/UX dizajnom i real-time simulacijom podataka.
+
+Ovaj prompt će kreirati kompletnu revizorsku aplikaciju sa interaktivnom mapom, detaljnim pregledima po glasačkim mjestima, praćenjem anomalija i comprehensive audit funkcionalnostima.
