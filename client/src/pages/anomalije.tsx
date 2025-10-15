@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +13,7 @@ import {
 import { Search, AlertTriangle, CheckCircle, Clock, MapPin, Filter } from "lucide-react";
 import { Anomalija } from "@shared/schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { mockAnomalije } from "@/lib/mockData";
 
 const getPrioritetBadge = (tip: string) => {
   switch (tip) {
@@ -42,9 +42,9 @@ export default function Anomalije() {
   const [tipFilter, setTipFilter] = useState<string>("svi");
   const [statusFilter, setStatusFilter] = useState<string>("svi");
 
-  const { data: anomalije = [], isLoading } = useQuery<Anomalija[]>({
-    queryKey: ['/api/anomalije'],
-  });
+  // Use mock data directly for static deployment
+  const anomalije = mockAnomalije;
+  const isLoading = false;
 
   const filteredAnomalije = anomalije.filter(anomalija => {
     const matchesSearch = 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +14,7 @@ import {
 import { Search, MapPin, Users, CheckCircle, AlertTriangle, Eye } from "lucide-react";
 import { GlasackoMjesto } from "@shared/schema";
 import { DetaljiDialog } from "@/components/dashboard/detalji-dialog";
+import { mockGlasackaMjesta } from "@/lib/mockData";
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -52,9 +52,9 @@ export default function GlasackaMjesta() {
   const [statusFilter, setStatusFilter] = useState<string>("svi");
   const [selectedMjesto, setSelectedMjesto] = useState<GlasackoMjesto | null>(null);
 
-  const { data: glasackaMjesta = [], isLoading } = useQuery<GlasackoMjesto[]>({
-    queryKey: ['/api/glasacka-mjesta'],
-  });
+  // Use mock data directly for static deployment
+  const glasackaMjesta = mockGlasackaMjesta;
+  const isLoading = false;
 
   const filteredMjesta = glasackaMjesta.filter(mjesto => {
     const matchesSearch = mjesto.naziv.toLowerCase().includes(search.toLowerCase()) ||

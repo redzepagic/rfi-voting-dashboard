@@ -5,24 +5,16 @@ import { AutentifikacijePanel } from "@/components/dashboard/autentifikacije-pan
 import { AnomalijePanel } from "@/components/dashboard/anomalije-panel";
 import { GlasackaMjestaTabela } from "@/components/dashboard/glasacka-mjesta-tabela";
 import { DetaljiDialog } from "@/components/dashboard/detalji-dialog";
-import { GlasackoMjesto, Anomalija } from "@shared/schema";
-import { useQuery } from "@tanstack/react-query";
-import { useRealTimeUpdates } from "@/hooks/use-real-time-updates";
+import { GlasackoMjesto } from "@shared/schema";
+import { mockGlasackaMjesta, mockAnomalije } from "@/lib/mockData";
 
 export default function Dashboard() {
   const [selectedMjesto, setSelectedMjesto] = useState<GlasackoMjesto | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const { data: glasackaMjesta = [] } = useQuery<GlasackoMjesto[]>({
-    queryKey: ['/api/glasacka-mjesta'],
-  });
-
-  const { data: anomalije = [] } = useQuery<Anomalija[]>({
-    queryKey: ['/api/anomalije'],
-  });
-
-  // Enable real-time updates
-  useRealTimeUpdates();
+  // Use mock data directly for static deployment
+  const glasackaMjesta = mockGlasackaMjesta;
+  const anomalije = mockAnomalije;
 
   const handleDetalji = (mjesto: GlasackoMjesto) => {
     setSelectedMjesto(mjesto);
