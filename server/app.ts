@@ -4,6 +4,10 @@ import { serveStatic } from "./vite";
 
 export async function createApp() {
   const app = express();
+
+  // Ensure production environment is set
+  process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
@@ -17,7 +21,7 @@ export async function createApp() {
     res.status(status).json({ message });
   });
 
-  // Serve static files
+  // Serve static files in production
   serveStatic(app);
 
   return app;
